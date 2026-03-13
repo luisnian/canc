@@ -901,7 +901,7 @@ function renderExtra(){
       <input class="extra-desc-input" type="text" placeholder="Concepto..."
         value="${escHtml(row.desc)}"
         onchange="updateExtraDesc('${row.id}', this.value)"
-        oninput="updateExtraDesc('${row.id}', this.value)"/>
+        onblur="updateExtraDesc('${row.id}', this.value)"/>
       <input class="extra-amount-input ${amtClass}" type="number" min="0" step="0.01"
         placeholder="0,00" value="${amount||''}"
         onchange="updateExtraAmount('${row.id}', this.value)"
@@ -925,11 +925,6 @@ function updateExtraDesc(id, val){
   const rows = loadExtra();
   const r = rows.find(x=>x.id===id); if(r) r.desc = val;
   saveExtra(rows); renderExtra();
-  // keep focus
-  requestAnimationFrame(()=>{
-    const inputs = document.querySelectorAll(`[data-id="${id}"] .extra-desc-input`);
-    if(inputs[0]){ const v=inputs[0].value; const pos=inputs[0].selectionStart; inputs[0].focus(); inputs[0].setSelectionRange(pos,pos); }
-  });
 }
 
 function updateExtraAmount(id, val){
