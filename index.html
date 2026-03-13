@@ -579,6 +579,7 @@ body::before {
     <button class="tab-btn"        onclick="switchTab(event,'loan2')">Préstamo 143 €</button>
     <button class="tab-btn"        onclick="switchTab(event,'loan3')">Cetelem 6.000 €</button>
     <button class="tab-btn"        onclick="switchTab(event,'extra')">💰 Dinero Extra</button>
+    <button class="tab-btn"        onclick="switchTab(event,'mama')">👩 Saldo Extras Mamá</button>
   </nav>
 
   <!-- LOAN 1 -->
@@ -690,6 +691,42 @@ body::before {
     </div>
   </div>
 
+  <!-- SALDO EXTRAS MAMÁ -->
+  <div id="panel-mama" class="panel">
+    <div class="extra-summary">
+      <div class="glass-card extra-balance-card">
+        <span class="accent">📥</span>
+        <div class="val positive" id="mama-total-income">0,00 €</div>
+        <div class="lbl">Total entradas</div>
+      </div>
+      <div class="glass-card extra-balance-card">
+        <span class="accent">📤</span>
+        <div class="val negative" id="mama-total-expense">0,00 €</div>
+        <div class="lbl">Total pagos</div>
+      </div>
+      <div class="glass-card extra-balance-card">
+        <span class="accent">👩</span>
+        <div class="val" id="mama-balance">0,00 €</div>
+        <div class="lbl">Saldo disponible</div>
+      </div>
+    </div>
+    <div class="glass-card log-card">
+      <div class="log-title">Registro de movimientos</div>
+      <div class="extra-row-head">
+        <span>Tipo</span>
+        <span>Concepto</span>
+        <span style="text-align:right">Importe</span>
+        <span style="text-align:right">Saldo</span>
+        <span></span>
+      </div>
+      <div id="rows-mama"></div>
+      <div class="btn-row-group" style="margin-top:14px">
+        <button class="btn-add-row btn-add-income" onclick="addMamaRow('income')">＋ Añadir entrada</button>
+        <button class="btn-add-row btn-add-expense" onclick="addMamaRow('expense')">＋ Añadir pago / deuda</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -758,6 +795,7 @@ function _enter(){
   document.getElementById('app').style.display='block';
   ['loan1','loan2','loan3'].forEach(id=>renderRows(id));
   renderExtra();
+  renderMama();
 }
 
 document.getElementById('eye-btn').addEventListener('click',()=>{
@@ -945,6 +983,86 @@ function addExtraRow(type){
   // focus the new row's description
   requestAnimationFrame(()=>{
     const allRows = document.querySelectorAll('#rows-extra .extra-row');
+    if(allRows.length){ const last = allRows[allRows.length-1]; const inp = last.querySelector('.extra-desc-input'); if(inp) inp.focus(); }
+  });
+}// ─── Saldo Extras Mamá ────────────────────────────────────────────────────
+const MAMA_KEY = 'mama_money_v1';
+
+function loadMama(){
+  try {
+    const d = JSON.parse(localStorage.getItem(MAMA_KEY));
+    if(d && Array.isArray(d) && d.length>0) return d;
+  } catch{}
+  return [];
+}
+function saveMama(rows){ localStorage.setItem(MAMA_KEY, JSON.stringify(rows)); }
+
+function renderMama(){
+  const rows = loadMama();
+  const container = document.getElementById('rows-mama');
+  container.innerHTML = '';
+  let running = 0;
+  let totalIncome = 0, totalExpense = 0;
+
+  rows.forEach(row => {
+    const amount = parseFloat(row.amount) || 0;
+    if(row.type === 'income')  { running += amount; totalIncome += amount; }
+    else                       { running -= amount; totalExpense += amount; }
+
+    const div = document.createElement('div');
+    div.className = 'extra-row ' + (row.type === 'income' ? 'is-income' : 'is-expense');
+    div.dataset.id = row.id;
+
+    const badgeClass = row.type === 'income' ? 'entrada' : 'pago';
+    const badgeText  = row.type === 'income' ? '+ Entrada' : '− Pago';
+    const amtClass   = row.type === 'income' ? 'income' : 'expense';
+    const balClass   = running >= 0 ? 'positive' : 'negative';
+
+    div.innerHTML = `
+      <span class="extra-type-badge ${badgeClass}">${badgeText}</span>
+      <input class="extra-desc-input" type="text" placeholder="Concepto..."
+        value="${escHtml(row.desc)}"
+        onchange="updateMamaDesc('${row.id}', this.value)"
+        onblur="updateMamaDesc('${row.id}', this.value)"/>
+      <input class="extra-amount-input ${amtClass}" type="number" min="0" step="0.01"
+        placeholder="0,00" value="${amount||''}"
+        onchange="updateMamaAmount('${row.id}', this.value)"
+        onblur="updateMamaAmount('${row.id}', this.value)"/>
+      <div class="extra-balance-cell ${balClass}">${fmt(running)}</div>
+      <button class="extra-del-btn" onclick="deleteMamaRow('${row.id}')" title="Eliminar">✕</button>`;
+    container.appendChild(div);
+  });
+
+  document.getElementById('mama-total-income').textContent  = fmt(totalIncome);
+  document.getElementById('mama-total-expense').textContent = fmt(totalExpense);
+  const balEl = document.getElementById('mama-balance');
+  balEl.textContent = fmt(running);
+  balEl.className = 'val ' + (running >= 0 ? 'positive' : 'negative');
+}
+
+function updateMamaDesc(id, val){
+  const rows = loadMama();
+  const r = rows.find(x=>x.id===id); if(r) r.desc = val;
+  saveMama(rows); renderMama();
+}
+
+function updateMamaAmount(id, val){
+  const rows = loadMama();
+  const r = rows.find(x=>x.id===id); if(r) r.amount = parseFloat(val)||0;
+  saveMama(rows); renderMama();
+}
+
+function deleteMamaRow(id){
+  const rows = loadMama().filter(x=>x.id!==id);
+  saveMama(rows); renderMama();
+}
+
+function addMamaRow(type){
+  const rows = loadMama();
+  rows.push({ id: genId(), type, desc: '', amount: 0 });
+  saveMama(rows); renderMama();
+  requestAnimationFrame(()=>{
+    const allRows = document.querySelectorAll('#rows-mama .extra-row');
     if(allRows.length){ const last = allRows[allRows.length-1]; const inp = last.querySelector('.extra-desc-input'); if(inp) inp.focus(); }
   });
 }
