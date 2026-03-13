@@ -905,7 +905,7 @@ function renderExtra(){
       <input class="extra-amount-input ${amtClass}" type="number" min="0" step="0.01"
         placeholder="0,00" value="${amount||''}"
         onchange="updateExtraAmount('${row.id}', this.value)"
-        oninput="updateExtraAmount('${row.id}', this.value)"/>
+        onblur="updateExtraAmount('${row.id}', this.value)"/>
       <div class="extra-balance-cell ${balClass}">${fmt(running)}</div>
       <button class="extra-del-btn" onclick="deleteExtraRow('${row.id}')" title="Eliminar">✕</button>`;
     container.appendChild(div);
@@ -931,10 +931,6 @@ function updateExtraAmount(id, val){
   const rows = loadExtra();
   const r = rows.find(x=>x.id===id); if(r) r.amount = parseFloat(val)||0;
   saveExtra(rows); renderExtra();
-  requestAnimationFrame(()=>{
-    const inputs = document.querySelectorAll(`[data-id="${id}"] .extra-amount-input`);
-    if(inputs[0]){ inputs[0].focus(); const v=inputs[0].value; inputs[0].value=''; inputs[0].value=v; }
-  });
 }
 
 function deleteExtraRow(id){
