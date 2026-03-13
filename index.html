@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan de Cancelación Anticipada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink:   #0d0e0f;
+  --dim:   #2a2d30;
+  --mid:   #60686f;
+  --ghost: #9aa0a6;
+  --pale:  #c8cdd2;
+  --ice:   #e8eaec;
+  --a:     #8bafc8;
+  --line:  rgba(138,175,200,.15);
+
+  --bg:            #f7f8f9;
+  --surface:       rgba(138,175,200,.05);
+  --surface-hover: rgba(138,175,200,.10);
+  --border:        rgba(138,175,200,.18);
+  --border-hover:  rgba(138,175,200,.42);
+  --text:          var(--ink);
+  --text-muted:    var(--mid);
+  --text-dim:      var(--ghost);
+  --accent:        var(--a);
+  --accent-glow:   rgba(139,175,200,.15);
+
+  --blue:   #4a90c4;
+  --green:  #5a9e82;
+  --orange: #c88a3a;
+  --red:    #c0675a;
+
+  --radius:    14px;
+  --radius-sm: 9px;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'Outfit', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  font-weight: 300;
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139,175,200,.10), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 100% 70%, rgba(139,175,200,.07), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 0%  100%, rgba(139,175,200,.05), transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+
+/* ═══ LOGIN ═══ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  background-color: var(--bg);
+  transition: opacity .4s ease;
+}
+#login-screen.hidden { opacity: 0; pointer-events: none; }
+#login-screen::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139,175,200,.12), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 100% 70%, rgba(139,175,200,.08), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 0%  100%, rgba(139,175,200,.06), transparent 55%);
+}
+
+.login-box {
+  position: relative; z-index: 1;
+  width: 360px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.78) 0%, rgba(240,246,252,0.55) 100%);
+  border: 1px solid rgba(255,255,255,0.75);
+  border-bottom-color: rgba(138,175,200,.20);
+  border-radius: 22px;
+  padding: 44px 38px 38px;
+  backdrop-filter: blur(32px) saturate(1.5) brightness(1.04);
+  -webkit-backdrop-filter: blur(32px) saturate(1.5) brightness(1.04);
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.85) inset,
+    0 -1px 0 rgba(138,175,200,.12) inset,
+    0 20px 60px rgba(100,130,160,.14),
+    0 2px 8px rgba(100,130,160,.08);
+  animation: fadeUp 0.45s ease;
+}
+
+.login-logo { text-align: center; margin-bottom: 36px; }
+.login-logo-icon { display: flex; justify-content: center; align-items: center; margin-bottom: 14px; }
+.login-logo-title { font-family: var(--serif); font-size: 22px; font-weight: 300; letter-spacing: -.02em; color: var(--ink); }
+.login-logo-sub { font-size: 11.5px; font-weight: 400; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.3px; }
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block; font-size: 10.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 1.2px;
+  color: var(--text-muted); margin-bottom: 8px;
+}
+.field-wrap { position: relative; }
+.field input {
+  width: 100%;
+  background: rgba(138,175,200,.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 44px 12px 15px;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px; font-weight: 400;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.field input::placeholder { color: var(--ghost); }
+.field input:focus { border-color: var(--accent); background: rgba(139,175,200,.07); box-shadow: 0 0 0 3px rgba(139,175,200,.12); }
+.field input.shake { animation: shake 0.35s ease; border-color: var(--red); background: rgba(192,103,90,0.06); }
+
+.toggle-eye {
+  position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer;
+  color: var(--ghost); padding: 2px; line-height: 0;
+  transition: color 0.2s;
+}
+.toggle-eye:hover { color: var(--ink); }
+
+.lockout-bar {
+  background: rgba(192,103,90,.07);
+  border: 1px solid rgba(192,103,90,.22);
+  border-radius: var(--radius-sm);
+  padding: 9px 14px;
+  font-size: 12px; color: var(--red);
+  font-weight: 500; text-align: center;
+  margin-bottom: 14px; display: none;
+}
+
+.attempts-hint {
+  font-size: 11px; color: var(--ghost);
+  text-align: right; margin-top: 5px;
+  min-height: 16px;
+}
+
+.btn-login {
+  width: 100%; padding: 13.5px;
+  background: transparent;
+  border: 1px solid rgba(13,14,15,.22);
+  border-radius: 0;
+  color: var(--ink); font-family: var(--sans);
+  font-size: 14px; font-weight: 400;
+  text-transform: uppercase; letter-spacing: .35em;
+  cursor: pointer; margin-top: 8px;
+  transition: border-color .2s, color .2s;
+}
+.btn-login:hover { border-color: var(--a); color: var(--a); }
+.btn-login:active { opacity: 0.7; }
+.btn-login:disabled { opacity: 0.30; cursor: not-allowed; }
+
+/* ═══ GLASS CARD ═══ */
+.glass-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.44) 50%, rgba(220,232,240,0.38) 100%);
+  border: 1px solid rgba(255,255,255,0.70);
+  border-bottom-color: rgba(138,175,200,.22);
+  border-right-color:  rgba(138,175,200,.18);
+  border-radius: 18px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(22px) saturate(1.6) brightness(1.04);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6) brightness(1.04);
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,0.80) inset,
+    0 -1px 0 0 rgba(138,175,200,.15) inset,
+    1px 0 0 0 rgba(255,255,255,0.55) inset,
+    0 6px 20px rgba(100,130,160,.10),
+    0 1px 3px rgba(100,130,160,.08);
+}
+.glass-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 8%; right: 8%; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.90), transparent);
+  pointer-events: none;
+}
+.glass-card::after {
+  content: ''; position: absolute;
+  top: -40%; left: -20%; width: 60%; height: 120%;
+  background: linear-gradient(115deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 60%, transparent 100%);
+  pointer-events: none; border-radius: 50%; transform: skewX(-12deg);
+}
+
+/* ═══ APP ═══ */
+#app { display: none; position: relative; z-index: 1; }
+.layout { max-width: 900px; margin: 0 auto; padding: 36px 28px 60px; }
+
+/* Header */
+.header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 32px; gap: 16px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+.header-eyebrow {
+  font-size: 10.5px; font-weight: 400; text-transform: uppercase;
+  letter-spacing: 1.8px; color: var(--ghost); margin-bottom: 4px;
+}
+.header-title {
+  font-family: var(--serif);
+  font-size: 48px; font-weight: 300; letter-spacing: -3px; line-height: 1;
+  color: var(--ink);
+}
+.header-sub { font-size: 12.5px; font-weight: 400; color: var(--mid); margin-top: 6px; letter-spacing: 0.1px; }
+
+.btn-logout {
+  background: linear-gradient(145deg, rgba(255,255,255,0.68), rgba(220,232,240,0.40));
+  border: 1px solid rgba(255,255,255,0.70);
+  border-bottom-color: rgba(138,175,200,.18);
+  border-radius: var(--radius); padding: 10px 15px;
+  color: var(--mid); font-family: var(--sans);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s; white-space: nowrap;
+  backdrop-filter: blur(18px) saturate(1.4);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.80) inset, 0 4px 14px rgba(100,130,160,.08);
+  letter-spacing: 0.2px;
+}
+.btn-logout:hover {
+  background: linear-gradient(145deg, rgba(255,230,228,0.75), rgba(240,210,208,0.50));
+  border-color: rgba(192,103,90,.25); color: var(--red);
+}
+
+/* Tabs */
+.tabs-nav {
+  display: flex; gap: .5rem;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0;
+}
+.tab-btn {
+  font-size: .58rem; letter-spacing: .32em; text-transform: uppercase;
+  color: var(--ghost); padding: .55rem 1.2rem;
+  border: 1px solid transparent; border-bottom: none;
+  background: transparent;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-weight: 300;
+  transition: border-color .2s, color .2s, background .2s;
+  position: relative; bottom: -1px;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active {
+  border-color: var(--border);
+  border-bottom-color: var(--bg);
+  color: var(--a);
+  background: var(--bg);
+}
+
+.panel { display: none; animation: fadeUp .3s ease; }
+.panel.active { display: block; }
+
+/* Summary grid */
+.summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.summary-card { padding: 22px 18px; text-align: center; }
+.summary-card .accent { font-size: 26px; display: block; margin-bottom: 8px; line-height: 1; }
+.summary-card .val {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 300; letter-spacing: -.4px;
+  color: var(--ink); margin-bottom: 4px;
+}
+.summary-card .lbl {
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--ghost);
+}
+
+/* Progress */
+.progress-card { padding: 26px 28px; margin-bottom: 14px; }
+.prog-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+.prog-title {
+  font-size: 10.5px; font-weight: 400; text-transform: uppercase;
+  letter-spacing: 1.6px; color: var(--ghost);
+}
+.prog-pct {
+  font-family: var(--serif);
+  font-size: 40px; font-weight: 300; letter-spacing: -2px;
+  transition: color 0.4s;
+}
+.track {
+  height: 6px;
+  background: rgba(138,175,200,.14);
+  border-radius: 100px; overflow: hidden; margin-bottom: 12px;
+}
+.fill {
+  height: 100%; border-radius: 100px;
+  transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative; overflow: hidden;
+}
+.fill::after {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,0.55),transparent);
+  animation: shim 2.4s infinite;
+}
+@keyframes shim { to { left: 100%; } }
+.prog-detail { display: flex; justify-content: space-between; font-size: 12px; color: var(--ghost); font-weight: 400; }
+.prog-detail strong { color: var(--mid); font-weight: 500; }
+
+/* Banner */
+.banner {
+  display: none; padding: 18px 24px; text-align: center;
+  background: rgba(90,158,130,.07);
+  border: 1px solid rgba(90,158,130,.25);
+  border-radius: var(--radius); margin-bottom: 14px;
+}
+.banner.show { display: block; animation: pop 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pop { from{opacity:0;transform:scale(0.90)} to{opacity:1;transform:scale(1)} }
+.banner h2 { font-family: var(--serif); font-size: 20px; font-weight: 300; color: var(--green); margin-bottom: 4px; }
+.banner p { font-size: 13px; color: var(--mid); }
+
+/* Note */
+.note {
+  padding: 13px 18px; margin-bottom: 14px;
+  background: rgba(138,175,200,.06);
+  border: 1px solid rgba(138,175,200,.20);
+  border-radius: var(--radius-sm);
+}
+.note p { font-size: 13px; color: var(--mid); line-height: 1.6; font-weight: 400; }
+.note strong { font-weight: 500; color: var(--dim); }
+
+/* Sobrante */
+.sobrante-note {
+  padding: 11px 16px; margin-bottom: 14px;
+  background: rgba(90,158,130,.06);
+  border: 1px solid rgba(90,158,130,.20);
+  border-radius: var(--radius-sm);
+  font-size: 13px; color: var(--green); font-weight: 400;
+}
+
+/* Log card */
+.log-card { padding: 24px 22px; margin-bottom: 14px; }
+.log-title {
+  font-size: 10.5px; font-weight: 400; text-transform: uppercase;
+  letter-spacing: 1.8px; color: var(--ghost);
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.log-title::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--line), transparent);
+}
+
+.row-head {
+  display: grid;
+  grid-template-columns: 1fr 100px 130px 130px 52px;
+  gap: 8px; padding: 0 12px 10px;
+  font-size: 10px; font-weight: 500; color: var(--ghost);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--line); margin-bottom: 4px;
+}
+.month-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 130px 130px 52px;
+  gap: 8px; padding: 10px 12px;
+  border-radius: 10px; align-items: center;
+  margin-bottom: 2px; transition: background 0.18s;
+}
+.month-row:hover { background: rgba(138,175,200,.07); }
+.month-row.goal {
+  border: 1px solid rgba(90,158,130,.22);
+  background: rgba(90,158,130,.04);
+}
+.month-row.goal:hover { background: rgba(90,158,130,.08); }
+
+.m-name { font-size: 13.5px; font-weight: 400; color: var(--dim); display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.goal-badge {
+  font-size: 9.5px; font-weight: 500;
+  background: rgba(90,158,130,.12); color: var(--green);
+  padding: 2px 9px; border-radius: 100px; letter-spacing: 0.4px; white-space: nowrap;
+  border: 1px solid rgba(90,158,130,.22);
+}
+.m-rec { font-size: 13px; color: var(--ghost); text-align: right; font-variant-numeric: tabular-nums; }
+.m-input {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: var(--sans); font-size: 13.5px; font-weight: 500; color: var(--ink);
+  background: rgba(138,175,200,.04);
+  text-align: right; outline: none;
+  transition: all 0.2s; font-variant-numeric: tabular-nums;
+}
+.m-input::placeholder { color: var(--ghost); }
+.m-input:focus { border-color: var(--accent); background: rgba(139,175,200,.07); box-shadow: 0 0 0 3px rgba(139,175,200,.12); }
+.m-total { font-size: 13.5px; font-weight: 500; color: var(--dim); text-align: right; font-variant-numeric: tabular-nums; }
+.m-status { font-size: 17px; text-align: center; }
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes shake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+
+@media(max-width:620px){
+  .summary-card .val { font-size: 17px; }
+  .row-head,.month-row { grid-template-columns:1fr 72px 90px 90px 38px; font-size:11px; gap:4px; padding:8px 8px; }
+  .m-name { font-size:12px; } .m-input { font-size:12px; padding:5px 7px; }
+  .m-total { font-size:12px; } .m-status { font-size:14px; }
+  .tabs-nav { flex-wrap:wrap; } .header-title { font-size:34px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon">
+        <svg width="48" height="48" viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="120" cy="50"  rx="108" ry="38" fill="#8bafc8"/>
+          <rect x="12" y="50"  width="216" height="46" fill="rgba(139,175,200,0.35)"/>
+          <rect x="12" y="96"  width="216" height="46" fill="rgba(139,175,200,0.28)"/>
+          <rect x="12" y="142" width="216" height="46" fill="rgba(139,175,200,0.22)"/>
+          <ellipse cx="120" cy="96"  rx="108" ry="38" fill="#9bbdd4"/>
+          <ellipse cx="120" cy="142" rx="108" ry="38" fill="#abc9de"/>
+          <ellipse cx="120" cy="188" rx="108" ry="38" fill="#bbd5e8"/>
+          <ellipse cx="120" cy="50"  rx="72" ry="18" fill="white" opacity="0.30"/>
+          <ellipse cx="120" cy="96"  rx="72" ry="18" fill="white" opacity="0.20"/>
+          <ellipse cx="120" cy="142" rx="72" ry="18" fill="white" opacity="0.16"/>
+          <ellipse cx="120" cy="188" rx="72" ry="18" fill="white" opacity="0.12"/>
+        </svg>
+      </div>
+      <div class="login-logo-title">Cancelación Anticipada</div>
+      <div class="login-logo-sub">Acceso restringido</div>
+    </div>
+
+    <div id="lockout-bar" class="lockout-bar"></div>
+
+    <div class="field">
+      <label>Usuario</label>
+      <div class="field-wrap">
+        <input type="text" id="inp-user" autocomplete="username" placeholder="usuario">
+      </div>
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <div class="field-wrap">
+        <input type="password" id="inp-pass" autocomplete="current-password" placeholder="••••••••">
+        <button class="toggle-eye" id="eye-btn" type="button" tabindex="-1">
+          <svg id="eye-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="attempts-hint" id="attempts-hint"></div>
+    <button class="btn-login" id="btn-login" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+<div class="layout">
+
+  <header class="header">
+    <div>
+      <div class="header-eyebrow">Plan Financiero</div>
+      <div class="header-title">Cancelación Anticipada</div>
+      <div class="header-sub">Registra tu ahorro mensual y sigue el progreso</div>
+    </div>
+    <button class="btn-logout" onclick="doLogout()">⎋ Salir</button>
+  </header>
+
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab(event,'loan1')">Préstamo 226 €</button>
+    <button class="tab-btn"        onclick="switchTab(event,'loan2')">Préstamo 143 €</button>
+    <button class="tab-btn"        onclick="switchTab(event,'loan3')">Cetelem 6.000 €</button>
+  </nav>
+
+  <!-- LOAN 1 -->
+  <div id="panel-loan1" class="panel active">
+    <div class="summary-grid">
+      <div class="glass-card summary-card"><span class="accent">💳</span><div class="val">3.247,73 €</div><div class="lbl">Capital inicial</div></div>
+      <div class="glass-card summary-card"><span class="accent">🎯</span><div class="val">1.766,07 €</div><div class="lbl">Para cancelar</div></div>
+      <div class="glass-card summary-card"><span class="accent">📅</span><div class="val">Oct 2026</div><div class="lbl">Fecha objetivo</div></div>
+    </div>
+    <div id="banner-loan1" class="banner"><h2>🎉 ¡Objetivo alcanzado!</h2><p>Ya tienes suficiente ahorro para cancelar el préstamo. ¡Enhorabuena!</p></div>
+    <div class="glass-card progress-card">
+      <div class="prog-header">
+        <span class="prog-title">Progreso de ahorro</span>
+        <span id="pct-loan1" class="prog-pct" style="color:var(--blue)">0%</span>
+      </div>
+      <div class="track"><div id="fill-loan1" class="fill" style="width:0%;background:linear-gradient(90deg,#6aaee0,#8bafc8)"></div></div>
+      <div class="prog-detail"><span>Acumulado: <strong id="acc-loan1">0,00 €</strong></span><span>Meta: <strong>1.766,07 €</strong></span></div>
+    </div>
+    <div class="note"><p><strong>Plan:</strong> Ahorra <strong>300 €/mes</strong> desde abril 2026. En octubre acumulas 2.100 € y puedes cancelar (capital pendiente: 1.766,07 €). El sobrante de <strong>333,93 €</strong> pasa al Préstamo 2.</p></div>
+    <div class="glass-card log-card">
+      <div class="log-title">Registro mensual</div>
+      <div class="row-head"><span>Mes</span><span style="text-align:right">Plan</span><span style="text-align:right">Aportado</span><span style="text-align:right">Total acumulado</span><span style="text-align:center">Estado</span></div>
+      <div id="rows-loan1"></div>
+    </div>
+  </div>
+
+  <!-- LOAN 2 -->
+  <div id="panel-loan2" class="panel">
+    <div class="summary-grid">
+      <div class="glass-card summary-card"><span class="accent">💳</span><div class="val">3.701,39 €</div><div class="lbl">Capital inicial</div></div>
+      <div class="glass-card summary-card"><span class="accent">🎯</span><div class="val">2.318,58 €</div><div class="lbl">Para cancelar</div></div>
+      <div class="glass-card summary-card"><span class="accent">📅</span><div class="val">Feb 2027</div><div class="lbl">Fecha objetivo</div></div>
+    </div>
+    <div id="banner-loan2" class="banner"><h2>🎉 ¡Objetivo alcanzado!</h2><p>Ya tienes suficiente ahorro para cancelar el préstamo. ¡Enhorabuena!</p></div>
+    <div class="glass-card progress-card">
+      <div class="prog-header">
+        <span class="prog-title">Progreso de ahorro</span>
+        <span id="pct-loan2" class="prog-pct" style="color:var(--green)">0%</span>
+      </div>
+      <div class="track"><div id="fill-loan2" class="fill" style="width:0%;background:linear-gradient(90deg,#5a9e82,#7dbd9f)"></div></div>
+      <div class="prog-detail"><span>Acumulado: <strong id="acc-loan2">333,93 €</strong></span><span>Meta: <strong>2.318,58 €</strong></span></div>
+    </div>
+    <div class="sobrante-note">🏦 Capital inicial: <strong>333,93 €</strong> — sobrante del Préstamo 1 (octubre 2026)</div>
+    <div class="note"><p><strong>Plan:</strong> Empieza con 333,93 € de sobrante + <strong>500 €/mes</strong> desde noviembre 2026. En febrero 2027 acumulas 2.333,93 € y puedes cancelar (capital pendiente: 2.318,58 €).</p></div>
+    <div class="glass-card log-card">
+      <div class="log-title">Registro mensual</div>
+      <div class="row-head"><span>Mes</span><span style="text-align:right">Plan</span><span style="text-align:right">Aportado</span><span style="text-align:right">Total acumulado</span><span style="text-align:center">Estado</span></div>
+      <div id="rows-loan2"></div>
+    </div>
+  </div>
+
+  <!-- LOAN 3 -->
+  <div id="panel-loan3" class="panel">
+    <div class="summary-grid">
+      <div class="glass-card summary-card"><span class="accent">💳</span><div class="val">6.000,00 €</div><div class="lbl">Capital prestado</div></div>
+      <div class="glass-card summary-card"><span class="accent">🎯</span><div class="val">3.970,56 €</div><div class="lbl">Para cancelar</div></div>
+      <div class="glass-card summary-card"><span class="accent">📅</span><div class="val">Oct 2027</div><div class="lbl">Fecha objetivo</div></div>
+    </div>
+    <div id="banner-loan3" class="banner"><h2>🎉 ¡Objetivo alcanzado!</h2><p>Ya tienes suficiente ahorro para cancelar el préstamo. ¡Enhorabuena!</p></div>
+    <div class="glass-card progress-card">
+      <div class="prog-header">
+        <span class="prog-title">Progreso de ahorro</span>
+        <span id="pct-loan3" class="prog-pct" style="color:var(--orange)">0%</span>
+      </div>
+      <div class="track"><div id="fill-loan3" class="fill" style="width:0%;background:linear-gradient(90deg,#c88a3a,#dba855)"></div></div>
+      <div class="prog-detail"><span>Acumulado: <strong id="acc-loan3">0,00 €</strong></span><span>Meta: <strong>3.970,56 €</strong></span></div>
+    </div>
+    <div class="note"><p><strong>Plan:</strong> Ahorra <strong>500 €/mes</strong> desde marzo 2027. En octubre 2027 acumulas 4.000 € y puedes cancelar (capital pendiente: 3.970,56 €). Cetelem puede cobrar hasta el 1% por cancelación anticipada cuando quede más de un año.</p></div>
+    <div class="glass-card log-card">
+      <div class="log-title">Registro mensual</div>
+      <div class="row-head"><span>Mes</span><span style="text-align:right">Plan</span><span style="text-align:right">Aportado</span><span style="text-align:right">Total acumulado</span><span style="text-align:center">Estado</span></div>
+      <div id="rows-loan3"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ─── Auth ──────────────────────────────────────────────────────────────────
+const _C = (()=>{
+  const _u = [0x61,0x64,0x6d,0x69,0x6e]; // admin
+  const _p = "0a85418b83fcdbcc859e5fc811a5cf7f55bbff7352fb040400c5daab8c1b41c8"; // Leida2109
+  return { u: String.fromCharCode(..._u), p: _p, ttl: 8*60*60*1000, maxTries: 5, lockBase: 15 };
+})();
+
+async function _h(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function _getState(){ return { tries:parseInt(sessionStorage.getItem('_t')||'0'), lockUntil:parseInt(sessionStorage.getItem('_l')||'0'), lockN:parseInt(sessionStorage.getItem('_n')||'0') }; }
+function _setState(s){ sessionStorage.setItem('_t',s.tries); sessionStorage.setItem('_l',s.lockUntil); sessionStorage.setItem('_n',s.lockN); }
+let _lockTimer=null;
+function _registerFail(){
+  const s=_getState(); s.tries++;
+  if(s.tries>=_C.maxTries){ s.lockN++; s.lockUntil=Date.now()+_C.lockBase*s.lockN*s.lockN*1000; s.tries=0; }
+  _setState(s);
+}
+function _isLocked(){ return Date.now()<_getState().lockUntil; }
+function _remainingSecs(){ return Math.ceil((_getState().lockUntil-Date.now())/1000); }
+function _startLockTimer(){
+  const bar=document.getElementById('lockout-bar'), btn=document.getElementById('btn-login');
+  if(_lockTimer) clearInterval(_lockTimer);
+  _lockTimer=setInterval(()=>{
+    const rem=_remainingSecs();
+    if(rem<=0){ clearInterval(_lockTimer); _lockTimer=null; bar.style.display='none'; btn.disabled=false; }
+    else{ const s=_getState(); bar.style.display='block'; bar.textContent=`⛔ Demasiados intentos (bloqueo nº${s.lockN}) — espera ${rem} ${rem===1?'segundo':'segundos'}`; btn.disabled=true; }
+  },400);
+}
+function _setSession(){ sessionStorage.setItem('_a','1'); sessionStorage.setItem('_e',String(Date.now()+_C.ttl)); }
+function _sessionOk(){ return sessionStorage.getItem('_a')==='1' && parseInt(sessionStorage.getItem('_e')||'0')>Date.now(); }
+function doLogout(){ sessionStorage.removeItem('_a'); sessionStorage.removeItem('_e'); location.reload(); }
+
+async function doLogin(){
+  if(_isLocked()) return;
+  const user=document.getElementById('inp-user').value.trim();
+  const pass=document.getElementById('inp-pass').value;
+  const hint=document.getElementById('attempts-hint');
+  const uInp=document.getElementById('inp-user');
+  const pInp=document.getElementById('inp-pass');
+  if(!user||!pass){ hint.textContent='Rellena todos los campos.'; return; }
+  const passHash=await _h(pass);
+  const ok=(user===_C.u)&&(passHash===_C.p);
+  if(!ok){
+    _registerFail(); const s=_getState();
+    [uInp,pInp].forEach(el=>{ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); });
+    pInp.value='';
+    if(_isLocked()){ _startLockTimer(); hint.textContent=''; }
+    else{ const left=_C.maxTries-s.tries; hint.textContent=`Credenciales incorrectas — ${left} intento${left!==1?'s':''} restante${left!==1?'s':''}`; }
+    return;
+  }
+  [uInp,pInp].forEach(el=>el.classList.remove('shake'));
+  hint.textContent=''; const s=_getState(); s.tries=0; _setState(s);
+  _setSession(); _enter();
+}
+
+function _enter(){
+  document.getElementById('login-screen').classList.add('hidden');
+  setTimeout(()=>document.getElementById('login-screen').style.display='none',400);
+  document.getElementById('app').style.display='block';
+  ['loan1','loan2','loan3'].forEach(id=>renderRows(id));
+}
+
+document.getElementById('eye-btn').addEventListener('click',()=>{
+  const inp=document.getElementById('inp-pass'); const show=inp.type==='password'; inp.type=show?'text':'password';
+  document.getElementById('eye-icon').innerHTML=show
+    ?`<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+    :`<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+});
+['inp-user','inp-pass'].forEach(id=>document.getElementById(id).addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); }));
+(function init(){ if(_sessionOk()){ _enter(); return; } if(_isLocked()) _startLockTimer(); })();
+
+// ─── Data ──────────────────────────────────────────────────────────────────
+const LOANS = {
+  loan1:{ base:0, target:1766.07,
+    schedule:[
+      {id:'2026-04',label:'Abril 2026',     pending:3039.61,rec:300},
+      {id:'2026-05',label:'Mayo 2026',      pending:2830.32,rec:300},
+      {id:'2026-06',label:'Junio 2026',     pending:2619.85,rec:300},
+      {id:'2026-07',label:'Julio 2026',     pending:2408.20,rec:300},
+      {id:'2026-08',label:'Agosto 2026',    pending:2195.36,rec:300},
+      {id:'2026-09',label:'Septiembre 2026',pending:1981.32,rec:300},
+      {id:'2026-10',label:'Octubre 2026',   pending:1766.07,rec:300,goal:true},
+    ]},
+  loan2:{ base:333.93, target:2318.58,
+    schedule:[
+      {id:'2026-11',label:'Noviembre 2026', pending:2704.51,rec:500},
+      {id:'2026-12',label:'Diciembre 2026', pending:2576.61,rec:500},
+      {id:'2027-01',label:'Enero 2027',     pending:2447.97,rec:500},
+      {id:'2027-02',label:'Febrero 2027',   pending:2318.58,rec:500,goal:true},
+    ]},
+  loan3:{ base:0, target:3970.56,
+    schedule:[
+      {id:'2027-03',label:'Marzo 2027',      pending:4788.71,rec:500},
+      {id:'2027-04',label:'Abril 2027',      pending:4674.14,rec:500},
+      {id:'2027-05',label:'Mayo 2027',       pending:4558.82,rec:500},
+      {id:'2027-06',label:'Junio 2027',      pending:4442.72,rec:500},
+      {id:'2027-07',label:'Julio 2027',      pending:4325.85,rec:500},
+      {id:'2027-08',label:'Agosto 2027',     pending:4208.20,rec:500},
+      {id:'2027-09',label:'Septiembre 2027', pending:4089.77,rec:500},
+      {id:'2027-10',label:'Octubre 2027',    pending:3970.56,rec:500,goal:true},
+    ]}
+};
+
+function load(){ try{ return JSON.parse(localStorage.getItem('prestamos_v2')||'{}'); }catch{ return {}; } }
+function save(d){ localStorage.setItem('prestamos_v2',JSON.stringify(d)); }
+function fmt(n){ return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+
+function renderRows(loanId){
+  const loan=LOANS[loanId], data=load()[loanId]||{};
+  const container=document.getElementById('rows-'+loanId);
+  container.innerHTML=''; let accumulated=loan.base;
+  loan.schedule.forEach(entry=>{
+    const saved=data[entry.id]||0; accumulated+=saved;
+    const canCancel=accumulated>=entry.pending, isGoal=!!entry.goal;
+    const row=document.createElement('div');
+    row.className='month-row'+(isGoal?' goal':'');
+    const badge=isGoal?`<span class="goal-badge">🎯 CANCELAR</span>`:'';
+    let statusIcon='⬜'; if(canCancel) statusIcon='✅'; else if(saved>0) statusIcon='🔄';
+    row.innerHTML=`
+      <div class="m-name">${entry.label}${badge}</div>
+      <div class="m-rec">${fmt(entry.rec)}</div>
+      <input class="m-input" type="number" min="0" step="0.01" placeholder="0,00"
+        value="${saved||''}" data-loan="${loanId}" data-month="${entry.id}"
+        onchange="handleInput(this)" oninput="handleInput(this)"/>
+      <div class="m-total" id="total-${loanId}-${entry.id}">${fmt(accumulated)}</div>
+      <div class="m-status" id="status-${loanId}-${entry.id}">${statusIcon}</div>`;
+    container.appendChild(row);
+  });
+  updateProgress(loanId);
+}
+
+function handleInput(el){
+  const loanId=el.dataset.loan, month=el.dataset.month, val=parseFloat(el.value)||0;
+  const d=load(); if(!d[loanId]) d[loanId]={};
+  if(val>0) d[loanId][month]=val; else delete d[loanId][month];
+  save(d); renderRows(loanId);
+  requestAnimationFrame(()=>{
+    const inputs=document.querySelectorAll(`[data-loan="${loanId}"][data-month="${month}"]`);
+    if(inputs[0]){ inputs[0].focus(); const v=inputs[0].value; inputs[0].value=''; inputs[0].value=v; }
+  });
+}
+
+function updateProgress(loanId){
+  const loan=LOANS[loanId], data=load()[loanId]||{};
+  let accumulated=loan.base; loan.schedule.forEach(e=>{ accumulated+=(data[e.id]||0); });
+  const pct=Math.min(100,(accumulated/loan.target)*100);
+  document.getElementById('pct-'+loanId).textContent=pct.toFixed(0)+'%';
+  document.getElementById('fill-'+loanId).style.width=pct+'%';
+  document.getElementById('acc-'+loanId).textContent=fmt(accumulated);
+  const banner=document.getElementById('banner-'+loanId);
+  if(accumulated>=loan.target) banner.classList.add('show'); else banner.classList.remove('show');
+}
+
+function switchTab(e,loanId){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+loanId).classList.add('active');
+  e.currentTarget.classList.add('active');
+}
+</script>
+</body>
+</html>
