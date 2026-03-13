@@ -395,12 +395,119 @@ body::before {
 @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 @keyframes shake  { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 
+/* ═══ DINERO EXTRA ═══ */
+.extra-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.extra-balance-card { padding: 22px 18px; text-align: center; }
+.extra-balance-card .accent { font-size: 26px; display: block; margin-bottom: 8px; line-height: 1; }
+.extra-balance-card .val {
+  font-family: var(--serif); font-size: 22px; font-weight: 300;
+  letter-spacing: -.4px; color: var(--ink); margin-bottom: 4px;
+}
+.extra-balance-card .val.positive { color: var(--green); }
+.extra-balance-card .val.negative { color: var(--red); }
+.extra-balance-card .lbl {
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--ghost);
+}
+
+.extra-row-head {
+  display: grid;
+  grid-template-columns: 40px 1fr 160px 120px 38px;
+  gap: 8px; padding: 0 12px 10px;
+  font-size: 10px; font-weight: 500; color: var(--ghost);
+  text-transform: uppercase; letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--line); margin-bottom: 4px;
+}
+.extra-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 160px 120px 38px;
+  gap: 8px; padding: 10px 12px;
+  border-radius: 10px; align-items: center;
+  margin-bottom: 2px; transition: background 0.18s;
+}
+.extra-row:hover { background: rgba(138,175,200,.07); }
+.extra-row.is-income { border-left: 3px solid rgba(90,158,130,.40); }
+.extra-row.is-expense { border-left: 3px solid rgba(192,103,90,.40); }
+
+.extra-type-badge {
+  font-size: 11px; font-weight: 600;
+  padding: 2px 7px; border-radius: 100px;
+  text-align: center; letter-spacing: 0.3px;
+}
+.extra-type-badge.entrada {
+  background: rgba(90,158,130,.12); color: var(--green);
+  border: 1px solid rgba(90,158,130,.25);
+}
+.extra-type-badge.pago {
+  background: rgba(192,103,90,.10); color: var(--red);
+  border: 1px solid rgba(192,103,90,.22);
+}
+
+.extra-desc-input, .extra-amount-input {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: var(--sans); font-size: 13.5px; font-weight: 400;
+  color: var(--ink); background: rgba(138,175,200,.04);
+  outline: none; transition: all 0.2s;
+}
+.extra-desc-input::placeholder, .extra-amount-input::placeholder { color: var(--ghost); }
+.extra-desc-input:focus, .extra-amount-input:focus {
+  border-color: var(--accent); background: rgba(139,175,200,.07);
+  box-shadow: 0 0 0 3px rgba(139,175,200,.12);
+}
+.extra-amount-input {
+  font-weight: 500; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.extra-amount-input.income { color: var(--green); }
+.extra-amount-input.expense { color: var(--red); }
+
+.extra-balance-cell {
+  font-size: 13.5px; font-weight: 500;
+  text-align: right; font-variant-numeric: tabular-nums;
+  color: var(--dim);
+}
+.extra-balance-cell.positive { color: var(--green); }
+.extra-balance-cell.negative { color: var(--red); }
+
+.extra-del-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--ghost); font-size: 15px; padding: 3px;
+  transition: color 0.2s; text-align: center; line-height: 1;
+}
+.extra-del-btn:hover { color: var(--red); }
+
+.btn-add-row {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-top: 14px; padding: 11px;
+  border-radius: var(--radius-sm);
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-add-income {
+  background: rgba(90,158,130,.08); color: var(--green);
+  border: 1px dashed rgba(90,158,130,.35);
+}
+.btn-add-income:hover { background: rgba(90,158,130,.14); border-color: rgba(90,158,130,.55); }
+.btn-add-expense {
+  background: rgba(192,103,90,.07); color: var(--red);
+  border: 1px dashed rgba(192,103,90,.30);
+}
+.btn-add-expense:hover { background: rgba(192,103,90,.13); border-color: rgba(192,103,90,.50); }
+
+.btn-row-group { display: flex; gap: 10px; }
+.btn-row-group .btn-add-row { flex: 1; }
+
 @media(max-width:620px){
   .summary-card .val { font-size: 17px; }
   .row-head,.month-row { grid-template-columns:1fr 72px 90px 90px 38px; font-size:11px; gap:4px; padding:8px 8px; }
   .m-name { font-size:12px; } .m-input { font-size:12px; padding:5px 7px; }
   .m-total { font-size:12px; } .m-status { font-size:14px; }
   .tabs-nav { flex-wrap:wrap; } .header-title { font-size:34px; }
+  .extra-row-head,.extra-row { grid-template-columns:36px 1fr 110px 90px 30px; font-size:11px; gap:4px; padding:7px 8px; }
+  .extra-balance-card .val { font-size:17px; }
+  .btn-row-group { flex-direction:column; }
 }
 </style>
 </head>
@@ -471,6 +578,7 @@ body::before {
     <button class="tab-btn active" onclick="switchTab(event,'loan1')">Préstamo 226 €</button>
     <button class="tab-btn"        onclick="switchTab(event,'loan2')">Préstamo 143 €</button>
     <button class="tab-btn"        onclick="switchTab(event,'loan3')">Cetelem 6.000 €</button>
+    <button class="tab-btn"        onclick="switchTab(event,'extra')">💰 Dinero Extra</button>
   </nav>
 
   <!-- LOAN 1 -->
@@ -546,6 +654,42 @@ body::before {
     </div>
   </div>
 
+  <!-- EXTRA MONEY -->
+  <div id="panel-extra" class="panel">
+    <div class="extra-summary">
+      <div class="glass-card extra-balance-card">
+        <span class="accent">📥</span>
+        <div class="val positive" id="extra-total-income">0,00 €</div>
+        <div class="lbl">Total entradas</div>
+      </div>
+      <div class="glass-card extra-balance-card">
+        <span class="accent">📤</span>
+        <div class="val negative" id="extra-total-expense">0,00 €</div>
+        <div class="lbl">Total pagos</div>
+      </div>
+      <div class="glass-card extra-balance-card">
+        <span class="accent">💰</span>
+        <div class="val" id="extra-balance">0,00 €</div>
+        <div class="lbl">Saldo disponible</div>
+      </div>
+    </div>
+    <div class="glass-card log-card">
+      <div class="log-title">Registro de movimientos</div>
+      <div class="extra-row-head">
+        <span>Tipo</span>
+        <span>Concepto</span>
+        <span style="text-align:right">Importe</span>
+        <span style="text-align:right">Saldo</span>
+        <span></span>
+      </div>
+      <div id="rows-extra"></div>
+      <div class="btn-row-group" style="margin-top:14px">
+        <button class="btn-add-row btn-add-income" onclick="addExtraRow('income')">＋ Añadir entrada</button>
+        <button class="btn-add-row btn-add-expense" onclick="addExtraRow('expense')">＋ Añadir pago / deuda</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 </div>
 
@@ -613,6 +757,7 @@ function _enter(){
   setTimeout(()=>document.getElementById('login-screen').style.display='none',400);
   document.getElementById('app').style.display='block';
   ['loan1','loan2','loan3'].forEach(id=>renderRows(id));
+  renderExtra();
 }
 
 document.getElementById('eye-btn').addEventListener('click',()=>{
@@ -711,6 +856,106 @@ function switchTab(e,loanId){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('panel-'+loanId).classList.add('active');
   e.currentTarget.classList.add('active');
+}// ─── Dinero Extra ──────────────────────────────────────────────────────────
+const EXTRA_KEY = 'extra_money_v1';
+const EXTRA_DEFAULTS = [
+  { id: 'e1', type: 'income',  desc: 'Entrada de dinero',  amount: 6000 },
+  { id: 'e2', type: 'expense', desc: 'Pago deudas',        amount: 5121.41 },
+  { id: 'e3', type: 'income',  desc: 'Segunda entrada',    amount: 1700 },
+];
+
+function loadExtra(){
+  try {
+    const d = JSON.parse(localStorage.getItem(EXTRA_KEY));
+    if(d && Array.isArray(d) && d.length>0) return d;
+  } catch{}
+  return JSON.parse(JSON.stringify(EXTRA_DEFAULTS));
+}
+function saveExtra(rows){ localStorage.setItem(EXTRA_KEY, JSON.stringify(rows)); }
+
+function genId(){ return 'e' + Date.now() + Math.floor(Math.random()*1000); }
+
+function renderExtra(){
+  const rows = loadExtra();
+  const container = document.getElementById('rows-extra');
+  container.innerHTML = '';
+  let running = 0;
+  let totalIncome = 0, totalExpense = 0;
+
+  rows.forEach((row, idx) => {
+    const amount = parseFloat(row.amount) || 0;
+    if(row.type === 'income')  { running += amount; totalIncome += amount; }
+    else                       { running -= amount; totalExpense += amount; }
+
+    const div = document.createElement('div');
+    div.className = 'extra-row ' + (row.type === 'income' ? 'is-income' : 'is-expense');
+    div.dataset.id = row.id;
+
+    const badgeClass = row.type === 'income' ? 'entrada' : 'pago';
+    const badgeText  = row.type === 'income' ? '+ Entrada' : '− Pago';
+    const amtClass   = row.type === 'income' ? 'income' : 'expense';
+    const balClass   = running >= 0 ? 'positive' : 'negative';
+
+    div.innerHTML = `
+      <span class="extra-type-badge ${badgeClass}">${badgeText}</span>
+      <input class="extra-desc-input" type="text" placeholder="Concepto..."
+        value="${escHtml(row.desc)}"
+        onchange="updateExtraDesc('${row.id}', this.value)"
+        oninput="updateExtraDesc('${row.id}', this.value)"/>
+      <input class="extra-amount-input ${amtClass}" type="number" min="0" step="0.01"
+        placeholder="0,00" value="${amount||''}"
+        onchange="updateExtraAmount('${row.id}', this.value)"
+        oninput="updateExtraAmount('${row.id}', this.value)"/>
+      <div class="extra-balance-cell ${balClass}">${fmt(running)}</div>
+      <button class="extra-del-btn" onclick="deleteExtraRow('${row.id}')" title="Eliminar">✕</button>`;
+    container.appendChild(div);
+  });
+
+  // Update summary cards
+  document.getElementById('extra-total-income').textContent  = fmt(totalIncome);
+  document.getElementById('extra-total-expense').textContent = fmt(totalExpense);
+  const balEl = document.getElementById('extra-balance');
+  balEl.textContent = fmt(running);
+  balEl.className = 'val ' + (running >= 0 ? 'positive' : 'negative');
+}
+
+function escHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function updateExtraDesc(id, val){
+  const rows = loadExtra();
+  const r = rows.find(x=>x.id===id); if(r) r.desc = val;
+  saveExtra(rows); renderExtra();
+  // keep focus
+  requestAnimationFrame(()=>{
+    const inputs = document.querySelectorAll(`[data-id="${id}"] .extra-desc-input`);
+    if(inputs[0]){ const v=inputs[0].value; const pos=inputs[0].selectionStart; inputs[0].focus(); inputs[0].setSelectionRange(pos,pos); }
+  });
+}
+
+function updateExtraAmount(id, val){
+  const rows = loadExtra();
+  const r = rows.find(x=>x.id===id); if(r) r.amount = parseFloat(val)||0;
+  saveExtra(rows); renderExtra();
+  requestAnimationFrame(()=>{
+    const inputs = document.querySelectorAll(`[data-id="${id}"] .extra-amount-input`);
+    if(inputs[0]){ inputs[0].focus(); const v=inputs[0].value; inputs[0].value=''; inputs[0].value=v; }
+  });
+}
+
+function deleteExtraRow(id){
+  const rows = loadExtra().filter(x=>x.id!==id);
+  saveExtra(rows); renderExtra();
+}
+
+function addExtraRow(type){
+  const rows = loadExtra();
+  rows.push({ id: genId(), type, desc: '', amount: 0 });
+  saveExtra(rows); renderExtra();
+  // focus the new row's description
+  requestAnimationFrame(()=>{
+    const allRows = document.querySelectorAll('#rows-extra .extra-row');
+    if(allRows.length){ const last = allRows[allRows.length-1]; const inp = last.querySelector('.extra-desc-input'); if(inp) inp.focus(); }
+  });
 }
 </script>
 </body>
